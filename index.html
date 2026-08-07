@@ -304,7 +304,8 @@
   // Remplace TON_USERNAME par ton propre @identifiant Telegram (sans @)
   buyBtn.addEventListener('click', () => {
     const msg = encodeURIComponent("Bonjour ! Je veux commander : Power — " + currentWeight + " (" + currentPrice + ")");
-    const url = const url = "https://t.me/INR?text=" + msg;
+    kconst url = "https://t.me/INR?text=" + msg;
+
 
     if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
   });
