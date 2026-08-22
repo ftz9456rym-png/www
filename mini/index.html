@@ -9,35 +9,30 @@
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
-      margin: 0; font-family: Outfit, system-ui, sans-serif; color: #f4f1ff;
+      margin: 0; font-family: Outfit, system-ui, sans-serif; color: #1d2433;
       min-height: 100dvh;
       background:
-        radial-gradient(900px 420px at 0% 0%, #5b2d7a 0%, transparent 50%),
-        radial-gradient(700px 380px at 100% 10%, #0e5d62 0%, transparent 46%),
-        #0b0714;
+        radial-gradient(900px 420px at 0% 0%, #d8ecff 0%, transparent 50%),
+        radial-gradient(700px 380px at 100% 10%, #ffe4c8 0%, transparent 46%),
+        #f6f8ff;
       padding: calc(18px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
     }
     .wrap { max-width: 430px; margin: 0 auto; }
-    .badge {
-      display: inline-block; padding: 6px 12px; border-radius: 999px;
-      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
-      letter-spacing: .08em; text-transform: uppercase; font-size: 12px; color: #d7cfff;
-    }
-    h1 { margin: 12px 0 8px; font-size: 30px; letter-spacing: -.03em; }
-    p { color: rgba(244,241,255,.66); line-height: 1.45; }
+    .badge { display: inline-block; padding: 6px 12px; border-radius: 999px; background: #e8f0ff; color: #35528a; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; }
+    h1 { margin: 12px 0 8px; font-size: 30px; }
+    p { color: #5b6780; line-height: 1.45; }
     .stack { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
-    a.card {
-      text-decoration: none; color: inherit; border-radius: 22px; padding: 16px;
-      display: block; border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 16px 30px rgba(0,0,0,.28), 0 8px 0 rgba(0,0,0,.35);
-      transform: translateY(-3px);
-    }
-    a.card:active { transform: translateY(0); box-shadow: 0 4px 0 rgba(0,0,0,.35); }
-    .mood { background: linear-gradient(160deg, #6a3dff, #c44dff); }
-    .zen { background: linear-gradient(160deg, #1ad6c4, #0b6f8a); }
-    .choix { background: linear-gradient(160deg, #ffb15a, #ff6a3d); color: #2a1208; }
-    .choix p { color: rgba(42,18,8,.72); }
+    a.card { text-decoration: none; color: inherit; border-radius: 22px; padding: 16px; display: block; box-shadow: 0 14px 24px rgba(40,60,90,.08), 0 8px 0 rgba(180,196,220,.45); transform: translateY(-3px); }
+    a.card:active { transform: translateY(0); }
     h2 { margin: 0 0 6px; font-size: 22px; }
+    .mood { background: linear-gradient(160deg, #6a3dff, #c44dff); color:#fff; }
+    .mood p, .zen p { color: rgba(255,255,255,.82); }
+    .zen { background: linear-gradient(160deg, #1ad6c4, #0b6f8a); color:#fff; }
+    .choix { background: linear-gradient(160deg, #ffb15a, #ff6a3d); color:#2a1208; }
+    .choix p { color: rgba(42,18,8,.72); }
+    .trade { background: linear-gradient(160deg, #eef7ff, #cfe8ff); }
+    .fit { background: linear-gradient(160deg, #fff4df, #ffe0b0); }
+    .klaro { background: linear-gradient(160deg, #fff1e6, #ffd2b3); }
     .hint { font-size: 13px; text-align: center; margin-top: 18px; }
   </style>
 </head>
@@ -45,26 +40,20 @@
   <div class="wrap">
     <div class="badge">Telegram Mini Apps</div>
     <h1>Choisis une app</h1>
-    <p>3 mini-apps 3D, prêtes à ouvrir dans Telegram ou le navigateur.</p>
+    <p>6 mini-apps 3D, prêtes pour Telegram.</p>
     <div class="stack">
-      <a class="card mood" href="moodflow/index.html">
-        <h2>MoodFlow</h2>
-        <p>Journal d’humeur, cartes 3D et série de jours.</p>
-      </a>
-      <a class="card zen" href="chronozen/index.html">
-        <h2>ChronoZen</h2>
-        <p>Timer Pomodoro avec orbe et anneau de focus.</p>
-      </a>
-      <a class="card choix" href="choix3d/index.html">
-        <h2>Choix3D</h2>
-        <p>Carte qui se retourne et choisit à ta place.</p>
-      </a>
+      <a class="card trade" href="nextrade/index.html"><h2>NexTrade</h2><p>Trading papier, watchlist lumineuse.</p></a>
+      <a class="card fit" href="aurorefit/index.html"><h2>AuroreFit</h2><p>Coach sportif IA et séance du jour.</p></a>
+      <a class="card klaro" href="klaro/index.html"><h2>Klaro</h2><p>Dépenses du mois, 3 secondes.</p></a>
+      <a class="card mood" href="moodflow/index.html"><h2>MoodFlow</h2><p>Journal d’humeur.</p></a>
+      <a class="card zen" href="chronozen/index.html"><h2>ChronoZen</h2><p>Timer focus 3D.</p></a>
+      <a class="card choix" href="choix3d/index.html"><h2>Choix3D</h2><p>La carte décide.</p></a>
     </div>
-    <p class="hint">Dans Telegram : BotFather → Mini App → colle l’URL de l’app.</p>
+    <p class="hint">BotFather → /newapp → colle l’URL de l’app.</p>
   </div>
   <script>
     const tg = window.Telegram?.WebApp;
-    if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor("#0b0714"); tg.setBackgroundColor("#0b0714"); }
+    if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor("#f6f8ff"); tg.setBackgroundColor("#f6f8ff"); }
   </script>
 </body>
 </html>
