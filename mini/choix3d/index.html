@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Choix3D</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#1a0d06; --text:#fff6ea; --muted:rgba(255,246,234,.62); }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; font-family: Outfit, system-ui, sans-serif; color: var(--text);
+      min-height: 100dvh;
+      background:
+        radial-gradient(800px 420px at 0% 0%, #8a3a12 0%, transparent 55%),
+        radial-gradient(600px 360px at 100% 10%, #7a1f3d 0%, transparent 50%),
+        #1a0d06;
+      padding: calc(16px + env(safe-area-inset-top)) 16px calc(22px + env(safe-area-inset-bottom));
+    }
+    .wrap { max-width: 430px; margin: 0 auto; }
+    header { text-align: center; }
+    .badge {
+      display: inline-block; padding: 6px 12px; border-radius: 999px;
+      background: rgba(255,176,80,.14); border: 1px solid rgba(255,176,80,.3);
+      color: #ffd7a1; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    }
+    h1 { margin: 10px 0 6px; font-size: 28px; }
+    p.lead { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+    .stage { perspective: 1100px; height: 220px; display: grid; place-items: center; margin-bottom: 8px; }
+    .card3d { width: min(86vw, 340px); height: 180px; position: relative; transform-style: preserve-3d; transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+    .card3d.flip { transform: rotateY(180deg); }
+    .face {
+      position: absolute; inset: 0; backface-visibility: hidden; border-radius: 24px;
+      display: grid; place-items: center; padding: 18px; text-align: center;
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 22px 40px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    .front { background: linear-gradient(160deg, #ffb15a, #ff6a3d 55%, #c43a2a); }
+    .back { background: linear-gradient(160deg, #ffe08a, #ff9f43 60%, #e25a12); transform: rotateY(180deg); }
+    .face small { display: block; opacity: .8; letter-spacing: .08em; text-transform: uppercase; font-size: 11px; }
+    .face strong { display: block; font-size: 28px; line-height: 1.15; margin-top: 6px; }
+    .row { display: flex; gap: 8px; margin-top: 8px; }
+    input {
+      flex: 1; height: 48px; border-radius: 14px; border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.28); color: var(--text); padding: 0 14px; font: 500 15px Outfit; outline: none;
+    }
+    .add { width: 48px; border: 0; border-radius: 14px; cursor: pointer; font-size: 22px; background: linear-gradient(180deg, #ffd18a, #ff8a3c); color: #3a1608; box-shadow: 0 7px 0 #b4531a; }
+    .add:active { transform: translateY(4px); box-shadow: 0 2px 0 #b4531a; }
+    .list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .tag { border: 0; border-radius: 999px; padding: 8px 12px; cursor: pointer; background: rgba(255,255,255,.08); color: var(--text); font: 600 13px Outfit; }
+    .actions { display: grid; grid-template-columns: 1.4fr .8fr; gap: 10px; margin-top: 14px; }
+    .btn { height: 52px; border: 0; border-radius: 16px; cursor: pointer; font: 700 16px Outfit; transform: translateY(-3px); }
+    .go { background: linear-gradient(180deg, #ffe3b0, #ff8a3c); color: #3a1608; box-shadow: 0 8px 0 #b4531a, 0 14px 22px rgba(255,138,60,.28); }
+    .clear { background: linear-gradient(180deg, #3a2418, #24140e); color: var(--text); box-shadow: 0 8px 0 #120904; border: 1px solid rgba(255,255,255,.1); }
+    .btn:active { transform: translateY(0); }
+    .hint { color: var(--muted); font-size: 13px; text-align: center; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="badge">Mini App · Choix3D</div>
+      <h1>Laisse la carte décider</h1>
+      <p class="lead">Ajoute tes options, retourne la carte 3D, obtens un choix.</p>
+    </header>
+    <div class="stage">
+      <div class="card3d" id="card">
+        <div class="face front"><div><small>Face cachée</small><strong>Prêt à choisir</strong></div></div>
+        <div class="face back"><div><small>Décision</small><strong id="result">…</strong></div></div>
+      </div>
+    </div>
+    <div class="row">
+      <input id="opt" placeholder="Ex. Sushi, Pizza, Tacos…" maxlength="42" />
+      <button class="add" id="add">+</button>
+    </div>
+    <div class="list" id="list"></div>
+    <div class="actions">
+      <button class="btn go" id="spin">Retourner la carte</button>
+      <button class="btn clear" id="clear">Vider</button>
+    </div>
+    <p class="hint">Touche une option pour la retirer. Minimum 2 choix.</p>
+  </div>
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor("#1a0d06"); tg.setBackgroundColor("#1a0d06"); }
+    const KEY = "choix3d.v1";
+    let options = JSON.parse(localStorage.getItem(KEY) || '["Cinema","Lecture","Sport"]');
+    const list = document.getElementById("list");
+    const card = document.getElementById("card");
+    const result = document.getElementById("result");
+    function persist() { localStorage.setItem(KEY, JSON.stringify(options)); }
+    function render() {
+      list.innerHTML = options.map((o,i) => `<button class="tag" data-i="${i}">${o} ×</button>`).join("");
+    }
+    document.getElementById("add").onclick = () => {
+      const v = document.getElementById("opt").value.trim();
+      if (!v) return;
+      options.push(v);
+      document.getElementById("opt").value = "";
+      persist(); render();
+    };
+    document.getElementById("opt").addEventListener("keydown", e => {
+      if (e.key === "Enter") document.getElementById("add").click();
+    });
+    list.onclick = e => {
+      const t = e.target.closest(".tag");
+      if (!t) return;
+      options.splice(Number(t.dataset.i), 1);
+      persist(); render();
+    };
+    document.getElementById("clear").onclick = () => { options = []; persist(); render(); card.classList.remove("flip"); };
+    document.getElementById("spin").onclick = () => {
+      if (options.length < 2) {
+        if (tg?.showAlert) tg.showAlert("Ajoute au moins 2 options.");
+        else alert("Ajoute au moins 2 options.");
+        return;
+      }
+      card.classList.remove("flip");
+      const pick = options[Math.floor(Math.random() * options.length)];
+      setTimeout(() => {
+        result.textContent = pick;
+        card.classList.add("flip");
+        if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
+      }, 80);
+    };
+    render();
+  </script>
+</body>
+</html>
