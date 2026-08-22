@@ -7,47 +7,53 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    :root { --ink:#1a241c; --soft:#6b7a70; --mint:#1aa36a; }
+    :root { --ink:#1a241c; --soft:#6b7a70; }
     * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     body { margin:0; font-family:Manrope,system-ui,sans-serif; color:var(--ink); background:linear-gradient(180deg,#ffe9c8 0%,#f3fff4 32%,#f6faf6 100%); min-height:100dvh; padding:calc(8px + env(safe-area-inset-top)) 14px calc(86px + env(safe-area-inset-bottom)); }
     .wrap { max-width:430px; margin:0 auto; }
     .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
     .brand { font-weight:800; font-size:22px; letter-spacing:-.05em; }
-    .pill { background:#fff; border-radius:999px; height:30px; padding:0 10px; display:flex; align-items:center; font-size:11px; font-weight:800; color:var(--soft); }
+    .pill { background:#fff; border-radius:999px; height:30px; padding:0 10px; display:flex; align-items:center; font-size:11px; font-weight:800; color:var(--soft); border:0; }
     .glass { background:rgba(255,255,255,.86); backdrop-filter:blur(16px); border:1px solid #fff; border-radius:28px; box-shadow:0 18px 40px rgba(40,60,30,.07); }
     .hero { padding:18px; margin-bottom:12px; }
     .k { font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); }
-    .cash { font-size:32px; font-weight:800; letter-spacing:-.05em; margin:4px 0 10px; }
+    .cash { font-size:22px; font-weight:800; margin:4px 0 10px; }
     .goals { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .goal { height:52px; border:0; border-radius:16px; background:#f3f7f3; font:800 13px Manrope; color:var(--ink); }
+    .goal { height:52px; border:0; border-radius:16px; background:#f3f7f3; font:800 13px Manrope; }
     .goal.on { background:#1a241c; color:#fff; }
-    .ex { display:flex; gap:10px; align-items:center; padding:12px 0; border-bottom:1px solid #eef3ee; }
-    .ck { width:22px; height:22px; border-radius:8px; border:2px solid #c9d6cc; flex:none; }
+    .ex { display:grid; grid-template-columns:22px 56px 1fr auto; gap:10px; align-items:center; padding:12px 0; border-bottom:1px solid #eef3ee; }
+    .ck { width:22px; height:22px; border-radius:8px; border:2px solid #c9d6cc; }
     .ex.done .ck { background:#1aa36a; border-color:#1aa36a; }
+    .thumb { width:56px; height:56px; border-radius:14px; object-fit:cover; background:#e8efe8; }
     .name { font-weight:800; } .sub { color:var(--soft); font-size:12px; font-weight:700; }
-    .donebtn { height:50px; border:0; border-radius:16px; font:800 15px Manrope; width:100%; margin-top:12px; background:#1aa36a; color:#fff; }
+    .vid { height:34px; border:0; border-radius:12px; background:#1a241c; color:#fff; font:800 11px Manrope; padding:0 10px; }
+    .donebtn,.play { height:50px; border:0; border-radius:16px; font:800 15px Manrope; width:100%; margin-top:12px; background:#1aa36a; color:#fff; }
+    .play { background:#1a241c; }
     .ask { background:#ff9f3c; color:#2a1600; border:0; border-radius:16px; padding:0 16px; height:48px; font:800 15px Manrope; }
     .chat { display:flex; gap:8px; margin-top:10px; }
     input { flex:1; height:48px; border:0; border-radius:16px; background:#f3f7f3; padding:0 14px; font:600 14px Manrope; outline:none; }
-    .bubble { background:#f3fff6; border-radius:18px; padding:12px 14px; line-height:1.45; font-weight:600; }
+    .bubble { background:#f3fff6; border-radius:18px; padding:12px 14px; font-weight:600; line-height:1.45; }
     .stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
-    .stat { background:#f6faf6; border-radius:16px; padding:10px; }
-    .stat b { display:block; font-size:16px; }
-    .rowx { display:flex; justify-content:space-between; gap:8px; padding:12px 14px; border-bottom:1px solid #eef3ee; }
+    .stat { background:#f6faf6; border-radius:16px; padding:10px; } .stat b { display:block; font-size:16px; }
+    .rowx { display:flex; justify-content:space-between; padding:12px 14px; border-bottom:1px solid #eef3ee; }
     .empty { text-align:center; color:var(--soft); padding:28px 16px; font-weight:700; }
     .nav { position:fixed; left:14px; right:14px; bottom:calc(10px + env(safe-area-inset-bottom)); max-width:402px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; background:#1a241c; border-radius:22px; padding:6px; z-index:20; }
     .nav button { height:46px; border:0; border-radius:16px; background:transparent; color:#9aada0; font:800 13px Manrope; }
     .nav button.on { background:#fff; color:#1a241c; }
     .hidden { display:none !important; }
     .hint { text-align:center; color:#8a9a8e; font-size:11px; margin-top:10px; }
+    .sheet { position:fixed; inset:0; background:rgba(20,30,22,.45); z-index:40; display:flex; align-items:flex-end; }
+    .panel { background:#fff; width:100%; max-width:430px; margin:0 auto; border-radius:28px 28px 0 0; padding:16px 16px calc(20px + env(safe-area-inset-bottom)); max-height:88dvh; overflow:auto; }
+    .cover { width:100%; height:180px; object-fit:cover; border-radius:18px; background:#e8efe8; }
+    .steps { margin:10px 0 0; padding-left:18px; font-weight:600; line-height:1.45; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div id="coach">
-      <div class="top"><div class="brand">AuroreFit</div><div class="pill">Séance du jour</div></div>
+      <div class="top"><div class="brand">AuroreFit</div><div class="pill">Démos + séance</div></div>
       <section class="glass hero"><div class="k">Objectif</div><div class="goals" id="goals"><button class="goal on" data-g="force">Force</button><button class="goal" data-g="cardio">Cardio</button><button class="goal" data-g="mobilite">Mobilité</button><button class="goal" data-g="maison">Maison 20 min</button></div></section>
-      <section class="glass hero"><div class="k">Séance</div><div class="cash" id="title" style="font-size:22px;margin-bottom:4px">Force</div><div id="plan"></div><button class="donebtn" id="finish">Valider la séance</button></section>
+      <section class="glass hero"><div class="k">Séance · Vidéo = image + démo</div><div class="cash" id="title">Force</div><div id="plan"></div><button class="donebtn" id="finish">Valider la séance</button></section>
       <section class="glass hero"><div class="k">Coach</div><div class="bubble" id="reply">Dis-moi si tu es fatigué, pressé, ou si un endroit te fait mal.</div><div class="chat"><input id="q" placeholder="Ex. 15 min, mal au genou…" /><button class="ask" id="ask">OK</button></div></section>
     </div>
     <div id="suivi" class="hidden">
@@ -55,28 +61,36 @@
       <section class="glass hero"><div class="k">Cette semaine</div><div class="cash" id="weekN">0 séances</div><div class="stats"><div class="stat"><div class="k">Total</div><b id="sTotal">0</b></div><div class="stat"><div class="k">Minutes</div><b id="sMin">0</b></div><div class="stat"><div class="k">kcal ~</div><b id="sKcal">0</b></div></div></section>
       <section class="glass" style="overflow:hidden"><div class="k" style="padding:14px 14px 0">Séances validées</div><div id="hist"></div></section>
     </div>
-    <p class="hint">Coach local · pas un avis médical.</p>
+    <p class="hint">Images + vidéos YouTube éducatives · pas un avis médical.</p>
   </div>
   <nav class="nav"><button class="on" id="tabC">Coach</button><button id="tabS">Suivi</button></nav>
+  <div id="modal" class="sheet hidden"><div class="panel"><div class="top"><div class="brand" id="mTitle" style="font-size:18px">Démo</div><button class="pill" id="mClose">Fermer</button></div><img class="cover" id="mImg" alt="démo" /><div class="sub" id="mDose" style="margin:8px 0"></div><ol class="steps" id="mSteps"></ol><button class="play" id="mPlay">▶ Voir la vidéo</button></div></div>
   <script>
     const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();tg.setHeaderColor("#ffe9c8");tg.setBackgroundColor("#f6faf6");}
     const KEY="aurorefit.suivi.v1";
     const META={force:{label:"Force",min:28,kcal:180},cardio:{label:"Cardio",min:24,kcal:220},mobilite:{label:"Mobilité",min:18,kcal:80},maison:{label:"Maison 20 min",min:20,kcal:140}};
-    const PLANS={force:[["Goblet squat","3×8"],["Pompes tempo","3×8"],["Row sac / haltère","3×10"],["Gainage","40 s"]],cardio:[["Marche rapide","5 min"],["Intervalles 1/1","10 min"],["Montées de genoux","4×30 s"],["Retour calme","4 min"]],mobilite:[["Chat-vache","10 resp."],["World’s greatest stretch","6 / côté"],["Hanches 90/90","8 / côté"],["Respiration 4-6","3 min"]],maison:[["Squat chaise","40 s"],["Pompes (genoux ok)","40 s"],["Fentes inversées","40 s"],["Gainage + repos","3 tours"]]};
-    let goal="force", checks=[0,0,0,0];
+    const EX={squat:{n:"Goblet squat",d:"3×8",yt:"zBV3ceGyAxw",steps:["Pieds un peu plus larges que les hanches.","Poids contre la poitrine, coudes bas.","Descends, genoux dehors, talons au sol."]},pompe:{n:"Pompes tempo",d:"3×8",yt:"6URcQFbGZTA",steps:["Mains sous les épaules, corps gainé.","Descends en 3 secondes, coudes à 45°.","Pousse en un bloc."]},row:{n:"Row sac / haltère",d:"3×10",yt:"pYcpY20QaE8",steps:["Dos plat, bassin en arrière.","Tire vers la hanche, omoplate serrée.","Redescends sans arrondir."]},gainage:{n:"Gainage",d:"40 s",yt:"bI2qDaLrKCg",steps:["Coudes sous les épaules.","Ligne tête-talons.","Ne creuse pas le bas du dos."]},marche:{n:"Marche rapide",d:"5 min",yt:"bI2qDaLrKCg",steps:["Pas dynamiques, épaules basses.","Bras accompagnent.","Tu dois encore pouvoir parler."]},inter:{n:"Intervalles 1/1",d:"10 min",yt:"bI2qDaLrKCg",steps:["1 min plus vite.","1 min facile.","5 fois."]},genoux:{n:"Montées de genoux",d:"4×30 s",yt:"bI2qDaLrKCg",steps:["Ventre gainé.","Genou vers la hanche.","Dos long."]},calme:{n:"Retour calme",d:"4 min",yt:"tT00XNqJ3uA",steps:["Marche lente.","Nez, expire long.","Rythme qui redescend."]},chat:{n:"Chat-vache",d:"10 resp.",yt:"tT00XNqJ3uA",steps:["À quatre pattes.","Inspire : ventre bas.","Expire : dos rond."]},wgs:{n:"World’s greatest stretch",d:"6 / côté",yt:"uCrxxDCuUow",steps:["Grande fente.","Ouvre le bras vers le ciel.","Talon arrière au sol."]},hanche:{n:"Hanches 90/90",d:"8 / côté",yt:"t4Zz6-aG8Iw",steps:["Deux genoux à 90°.","Colonne longue.","Passe de l’autre côté doucement."]},respi:{n:"Respiration 4-6",d:"3 min",yt:"tT00XNqJ3uA",steps:["Inspire 4 s.","Expire 6 s.","Épaules relâchées."]},chaise:{n:"Squat chaise",d:"40 s",yt:"zBV3ceGyAxw",steps:["Touche la chaise sans t’effondrer.","Pousse dans les talons.","Poitrine ouverte."]},pompeK:{n:"Pompes (genoux ok)",d:"40 s",yt:"mECzqUIDWfU",steps:["Genoux au sol si besoin.","Tête-genoux alignés.","Poitrine vers le sol."]},fente:{n:"Fentes inversées",d:"40 s",yt:"_ggxoUsCx7A",steps:["Recule un pied.","Genou avant au-dessus du pied.","Pousse le talon avant."]}};
+    const PLANS={force:["squat","pompe","row","gainage"],cardio:["marche","inter","genoux","calme"],mobilite:["chat","wgs","hanche","respi"],maison:["chaise","pompeK","fente","gainage"]};
+    let goal="force", checks=[0,0,0,0], currentEx="squat";
     let state=JSON.parse(localStorage.getItem(KEY)||"null")||{sessions:[]};
     const persist=()=>localStorage.setItem(KEY,JSON.stringify(state));
-    const weekStart=()=>{const d=new Date();const day=(d.getDay()+6)%7;d.setHours(0,0,0,0);d.setDate(d.getDate()-day);return +d;};
-    function paintPlan(){document.getElementById("title").textContent=META[goal].label+" · "+META[goal].min+" min";document.getElementById("plan").innerHTML=PLANS[goal].map((e,i)=>`<div class="ex ${checks[i]?"done":""}" data-i="${i}"><div class="ck"></div><div><div class="name">${e[0]}</div><div class="sub">${e[1]}</div></div></div>`).join("");}
-    function coach(text){const t=text.toLowerCase();if(/genou|cheville|dos|épaule|mal/.test(t))return "On coupe l’impact. Mobilité + unilatéral léger. Tu stoppes si la douleur monte.";if(/fatig|sommeil|crev/.test(t))return "Séance courte : 12 min mobilité + 8 min marche. La récup compte autant que l’effort.";if(/15|20|press|manque de temps|vite/.test(t))return "Circuit maison 20 min : 40 s effort / 20 s pause, 3 tours. Valide ensuite dans Suivi.";if(/course|run|footing/.test(t))return "5 min facile, puis 6×1 min un peu plus vite / 1 min facile.";if(/abdo|core|gainage/.test(t))return "Dead bug 8/côté, side plank 25 s, hollow 20 s. 3 tours.";return "Garde cette séance. Coche les exercices, puis valide pour l’enregistrer dans ton suivi.";}
-    function renderSuivi(){const w=weekStart();const week=state.sessions.filter(s=>s.at>=w);const min=state.sessions.reduce((a,s)=>a+s.min,0);const kcal=state.sessions.reduce((a,s)=>a+s.kcal,0);document.getElementById("weekN").textContent=week.length+" séance"+(week.length>1?"s":"");document.getElementById("sTotal").textContent=state.sessions.length;document.getElementById("sMin").textContent=min;document.getElementById("sKcal").textContent=kcal;document.getElementById("hist").innerHTML=state.sessions.length?state.sessions.slice(0,25).map(s=>`<div class="rowx"><div><b>${s.label}</b><div class="sub">${s.when}</div></div><div style="text-align:right;font-weight:800">${s.min} min<div class="sub">${s.kcal} kcal</div></div></div>`).join(""):`<div class="empty">Aucune séance validée.<br>Termine-en une dans Coach.</div>`;}
-    function show(id){document.getElementById("coach").classList.toggle("hidden",id!=="coach");document.getElementById("suivi").classList.toggle("hidden",id!=="suivi");document.getElementById("tabC").classList.toggle("on",id==="coach");document.getElementById("tabS").classList.toggle("on",id==="suivi");}
-    document.getElementById("goals").onclick=e=>{const b=e.target.closest(".goal");if(!b)return;document.querySelectorAll(".goal").forEach(x=>x.classList.remove("on"));b.classList.add("on");goal=b.dataset.g;checks=[0,0,0,0];paintPlan();};
-    document.getElementById("plan").onclick=e=>{const row=e.target.closest(".ex");if(!row)return;const i=+row.dataset.i;checks[i]=checks[i]?0:1;paintPlan();};
-    document.getElementById("finish").onclick=()=>{const m=META[goal];const when=new Date().toLocaleString("fr-FR",{weekday:"short",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});state.sessions.unshift({g:goal,label:m.label,min:m.min,kcal:m.kcal,when,at:Date.now()});persist();checks=[0,0,0,0];paintPlan();show("suivi");renderSuivi();if(tg?.HapticFeedback)tg.HapticFeedback.notificationOccurred("success");};
-    document.getElementById("ask").onclick=()=>{const v=document.getElementById("q").value.trim();if(!v)return;document.getElementById("reply").textContent=coach(v);if(tg?.HapticFeedback)tg.HapticFeedback.impactOccurred("light");};
+    const weekStart=()=>{const d=new Date(); const day=(d.getDay()+6)%7; d.setHours(0,0,0,0); d.setDate(d.getDate()-day); return +d;};
+    const thumb=id=>"https://img.youtube.com/vi/"+id+"/hqdefault.jpg";
+    const openLink=url=>tg?.openLink?tg.openLink(url):window.open(url,"_blank");
+    function paintPlan(){document.getElementById("title").textContent=META[goal].label+" · "+META[goal].min+" min";document.getElementById("plan").innerHTML=PLANS[goal].map((id,i)=>{const e=EX[id];return `<div class="ex ${checks[i]?"done":""}" data-i="${i}"><div class="ck"></div><img class="thumb" alt="" src="${thumb(e.yt)}"/><div><div class="name">${e.n}</div><div class="sub">${e.d}</div></div><button class="vid" data-demo="${id}">Vidéo</button></div>`;}).join("");}
+    function openDemo(id){const e=EX[id]; currentEx=id; document.getElementById("mTitle").textContent=e.n; document.getElementById("mDose").textContent=e.d+" · image + vidéo de forme"; document.getElementById("mImg").src=thumb(e.yt); document.getElementById("mSteps").innerHTML=e.steps.map(s=>"<li>"+s+"</li>").join(""); document.getElementById("modal").classList.remove("hidden");}
+    function coach(text){const t=text.toLowerCase(); if(/genou|cheville|dos|épaule|mal/.test(t))return "On coupe l’impact. Mobilité + unilatéral léger."; if(/fatig|sommeil|crev/.test(t))return "12 min mobilité + 8 min marche aujourd’hui."; if(/15|20|press|vite/.test(t))return "Circuit maison 20 min, 40/20, 3 tours."; if(/course|run|footing/.test(t))return "5 min facile puis 6×1 min plus vite / 1 min facile."; if(/abdo|core|gainage/.test(t))return "Dead bug, side plank, hollow. 3 tours."; return "Ouvre Vidéo sous chaque exo pour l’image et la démo.";}
+    function renderSuivi(){const w=weekStart(); const week=state.sessions.filter(s=>s.at>=w); document.getElementById("weekN").textContent=week.length+" séance"+(week.length>1?"s":""); document.getElementById("sTotal").textContent=state.sessions.length; document.getElementById("sMin").textContent=state.sessions.reduce((a,s)=>a+s.min,0); document.getElementById("sKcal").textContent=state.sessions.reduce((a,s)=>a+s.kcal,0); document.getElementById("hist").innerHTML=state.sessions.length?state.sessions.slice(0,25).map(s=>`<div class="rowx"><div><b>${s.label}</b><div class="sub">${s.when}</div></div><div style="text-align:right;font-weight:800">${s.min} min<div class="sub">${s.kcal} kcal</div></div></div>`).join(""):`<div class="empty">Aucune séance validée.</div>`;}
+    function show(id){document.getElementById("coach").classList.toggle("hidden",id!=="coach"); document.getElementById("suivi").classList.toggle("hidden",id!=="suivi"); document.getElementById("tabC").classList.toggle("on",id==="coach"); document.getElementById("tabS").classList.toggle("on",id==="suivi");}
+    document.getElementById("goals").onclick=e=>{const b=e.target.closest(".goal"); if(!b)return; document.querySelectorAll(".goal").forEach(x=>x.classList.remove("on")); b.classList.add("on"); goal=b.dataset.g; checks=[0,0,0,0]; paintPlan();};
+    document.getElementById("plan").onclick=e=>{const d=e.target.closest("[data-demo]"); if(d){openDemo(d.dataset.demo); return;} const row=e.target.closest(".ex"); if(!row)return; const i=+row.dataset.i; checks[i]=checks[i]?0:1; paintPlan();};
+    document.getElementById("mClose").onclick=()=>document.getElementById("modal").classList.add("hidden");
+    document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")document.getElementById("modal").classList.add("hidden");};
+    document.getElementById("mPlay").onclick=()=>openLink("https://www.youtube.com/watch?v="+EX[currentEx].yt);
+    document.getElementById("finish").onclick=()=>{const m=META[goal]; const when=new Date().toLocaleString("fr-FR",{weekday:"short",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}); state.sessions.unshift({g:goal,label:m.label,min:m.min,kcal:m.kcal,when,at:Date.now()}); persist(); checks=[0,0,0,0]; paintPlan(); show("suivi"); renderSuivi();};
+    document.getElementById("ask").onclick=()=>{const v=document.getElementById("q").value.trim(); if(v) document.getElementById("reply").textContent=coach(v);};
     document.getElementById("tabC").onclick=()=>show("coach");
-    document.getElementById("tabS").onclick=()=>{show("suivi");renderSuivi();};
+    document.getElementById("tabS").onclick=()=>{show("suivi"); renderSuivi();};
     paintPlan();
   </script>
 </body>
