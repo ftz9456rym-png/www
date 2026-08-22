@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>NexTrade</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#f3f7ff; --ink:#16324f; --muted:#5b7390; --mint:#1dbf9a; --rose:#ef5d7a; --line:#d7e3f4; }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { margin:0; font-family:Outfit,system-ui,sans-serif; color:var(--ink); min-height:100dvh; background:radial-gradient(900px 380px at 0% -10%, #c8e7ff 0%, transparent 55%), radial-gradient(700px 320px at 100% 0%, #d9ffe8 0%, transparent 50%), var(--bg); padding:calc(16px + env(safe-area-inset-top)) 16px calc(22px + env(safe-area-inset-bottom)); }
+    .wrap { max-width:430px; margin:0 auto; }
+    .badge { display:inline-block; padding:6px 12px; border-radius:999px; background:#e7f4ff; color:#2a6aa3; font-size:12px; letter-spacing:.06em; text-transform:uppercase; }
+    h1 { margin:10px 0 4px; font-size:28px; }
+    .lead { margin:0 0 14px; color:var(--muted); font-size:14px; }
+    .hero { background:linear-gradient(180deg,#fff,#f4fbff); border:1px solid var(--line); border-radius:24px; padding:16px; box-shadow:0 16px 0 #d5e6f7, 0 22px 28px rgba(40,80,130,.08); }
+    .cash { font-size:34px; font-weight:700; }
+    .pnl { font-weight:700; } .up { color:var(--mint); } .down { color:var(--rose); }
+    .list { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+    .row { display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid var(--line); border-radius:18px; padding:12px 14px; box-shadow:0 10px 0 #e4eef8; }
+    .sym { font-weight:700; } .mini { color:var(--muted); font-size:12px; } .btns { display:flex; gap:8px; }
+    button { border:0; cursor:pointer; font:700 13px Outfit; border-radius:12px; height:36px; padding:0 12px; }
+    .buy { background:linear-gradient(180deg,#bff8e6,#1dbf9a); color:#053428; box-shadow:0 5px 0 #12886d; }
+    .sell { background:linear-gradient(180deg,#ffd4dc,#ef5d7a); color:#4a1020; box-shadow:0 5px 0 #b63b54; }
+    button:active { transform:translateY(3px); }
+    .hint { color:var(--muted); font-size:12px; text-align:center; margin-top:12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="badge">Mini App · NexTrade</div>
+    <h1>Carnet démo</h1>
+    <p class="lead">Watchlist lumineuse, achats / ventes simulés. Pas un conseil financier.</p>
+    <section class="hero"><div class="mini">Portefeuille papier</div><div class="cash" id="cash">10 000 €</div><div class="pnl" id="pnl">P&L +0 €</div></section>
+    <div class="list" id="list"></div>
+    <p class="hint">Les prix bougent localement pour l’exercice. Aucun ordre réel.</p>
+  </div>
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor("#f3f7ff"); tg.setBackgroundColor("#f3f7ff"); }
+    const KEY = "nextrade.v1";
+    const ASSETS = [{ id:"EURUSD", name:"EUR / USD", px:1.086 },{ id:"BTC", name:"Bitcoin", px:64250 },{ id:"AAPL", name:"Apple", px:228.4 },{ id:"GOLD", name:"Or", px:2388 }];
+    let state = JSON.parse(localStorage.getItem(KEY) || "null") || { cash:10000, pos:{EURUSD:0,BTC:0,AAPL:0,GOLD:0}, start:10000 };
+    function fmt(n){ return n.toLocaleString("fr-FR",{maximumFractionDigits:2}) + " €"; }
+    function persist(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+    function equity(){ return state.cash + ASSETS.reduce((s,a)=> s + state.pos[a.id]*a.px, 0); }
+    function render(){
+      const eq = equity(); const d = eq - state.start;
+      document.getElementById("cash").textContent = fmt(eq);
+      const el = document.getElementById("pnl");
+      el.textContent = `P&L ${d>=0?"+":""}${fmt(d)}`;
+      el.className = "pnl " + (d>=0?"up":"down");
+      document.getElementById("list").innerHTML = ASSETS.map(a => {
+        const qty = state.pos[a.id];
+        return `<div class="row"><div><div class="sym">${a.id}</div><div class="mini">${a.name} · ${a.px.toLocaleString("fr-FR")}${qty? " · qty "+qty:""}</div></div><div class="btns"><button class="buy" data-id="${a.id}" data-side="buy">Buy</button><button class="sell" data-id="${a.id}" data-side="sell">Sell</button></div></div>`;
+      }).join("");
+    }
+    document.getElementById("list").onclick = e => {
+      const b = e.target.closest("button"); if(!b) return;
+      const a = ASSETS.find(x=>x.id===b.dataset.id); const side = b.dataset.side;
+      const unit = a.id==="BTC" ? 0.001 : a.id==="EURUSD" ? 1000 : 1; const cost = a.px * unit;
+      if (side==="buy" && state.cash>=cost) { state.cash-=cost; state.pos[a.id]+=unit; }
+      else if (side==="sell" && state.pos[a.id]>=unit) { state.cash+=cost; state.pos[a.id]-=unit; }
+      persist(); render();
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
+    };
+    setInterval(()=>{ ASSETS.forEach(a => { a.px = +(a.px * (1 + (Math.random()-.5)*0.004)).toFixed(a.px>50?2:5); }); render(); }, 2200);
+    render();
+  </script>
+</body>
+</html>
