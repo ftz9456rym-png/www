@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>AuroreFit</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { margin:0; font-family:Outfit,system-ui,sans-serif; color:#1d2a24; min-height:100dvh; background:radial-gradient(800px 360px at 10% -8%, #ffe7c4 0%, transparent 55%), radial-gradient(700px 300px at 100% 0%, #c8f5d8 0%, transparent 50%), #f7fff8; padding:calc(16px + env(safe-area-inset-top)) 16px calc(22px + env(safe-area-inset-bottom)); }
+    .wrap { max-width:430px; margin:0 auto; }
+    .badge { display:inline-block; padding:6px 12px; border-radius:999px; background:#fff1d6; color:#9a5b12; font-size:12px; letter-spacing:.06em; text-transform:uppercase; }
+    h1 { margin:10px 0 4px; font-size:28px; }
+    .lead { margin:0 0 14px; color:#5c7268; font-size:14px; }
+    .goals { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .goal { border:1px solid #d7eadc; border-radius:18px; min-height:76px; cursor:pointer; background:#fff; color:#1d2a24; font:700 14px Outfit; box-shadow:0 10px 0 #e4f0e6; }
+    .goal.on { background:linear-gradient(180deg,#fff4cf,#ffb347); box-shadow:0 10px 0 #e08922; }
+    .card { margin-top:14px; background:#fff; border-radius:22px; padding:16px; border:1px solid #d7eadc; box-shadow:0 16px 0 #e6f3ea; }
+    .ex { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eef5f0; font-weight:600; }
+    .ex:last-child { border:0; }
+    .mini { color:#5c7268; font-size:13px; font-weight:500; }
+    .chat { display:flex; gap:8px; margin-top:12px; }
+    input { flex:1; height:48px; border-radius:14px; border:1px solid #d7eadc; padding:0 12px; font:500 15px Outfit; outline:none; background:#fbfff9; }
+    .ask { height:48px; border:0; border-radius:14px; padding:0 14px; cursor:pointer; font:700 14px Outfit; color:#2a1a08; background:linear-gradient(180deg,#ffe7b0,#ffb347); box-shadow:0 6px 0 #d4891c; }
+    .bubble { margin-top:10px; background:#f3fff6; border-radius:16px; padding:12px; line-height:1.45; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="badge">Mini App · Coach IA</div>
+    <h1>AuroreFit</h1>
+    <p class="lead">Choisis un objectif, reçois une séance du jour et pose une question au coach.</p>
+    <div class="goals">
+      <button class="goal on" data-g="force">Force</button>
+      <button class="goal" data-g="cardio">Cardio</button>
+      <button class="goal" data-g="mobilite">Mobilité</button>
+      <button class="goal" data-g="maison">Maison 20 min</button>
+    </div>
+    <section class="card" id="plan"></section>
+    <section class="card">
+      <div class="mini">Coach</div>
+      <div class="bubble" id="reply">Dis-moi si tu es fatigué, pressé, ou si tu as mal quelque part.</div>
+      <div class="chat"><input id="q" placeholder="Ex. J’ai 15 min, mal au genou…" /><button class="ask" id="ask">OK</button></div>
+    </section>
+  </div>
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor("#f7fff8"); tg.setBackgroundColor("#f7fff8"); }
+    const PLANS = {
+      force:[["Goblet squat","3×8"],["Pompes tempo","3×8"],["Row sac/haltère","3×10"],["Gainage","40 s"]],
+      cardio:[["Marche rapide","5 min"],["Intervalles 1/1","10 min"],["Montées de genoux","4×30 s"],["Retour calme","4 min"]],
+      mobilite:[["Chat-vache","10 resp."],["World’s greatest stretch","6/côté"],["Hanches 90/90","8/côté"],["Respiration 4-6","3 min"]],
+      maison:[["Squat chaise","40 s"],["Pompes genoux ok","40 s"],["Fentes inversées","40 s"],["Gainage + repos","3 tours"]]
+    };
+    let goal = "force";
+    function paintPlan(){ document.getElementById("plan").innerHTML = `<div class="mini">Séance du jour</div>` + PLANS[goal].map(([n,d])=>`<div class="ex"><span>${n}</span><span class="mini">${d}</span></div>`).join(""); }
+    document.querySelectorAll(".goal").forEach(b=>{ b.onclick=()=>{ document.querySelectorAll(".goal").forEach(x=>x.classList.remove("on")); b.classList.add("on"); goal=b.dataset.g; paintPlan(); }; });
+    function coach(text){
+      const t = text.toLowerCase();
+      if (/genou|cheville|dos|épaule|mal/.test(t)) return "On évite l’impact. Passe en mobilité + travail unilatéral léger. Stop si la douleur augmente.";
+      if (/fatig|sommeil|crev/.test(t)) return "Séance courte aujourd’hui : 12 min de mobilité et 8 min de marche. La récupération compte.";
+      if (/15|20|press|manque de temps|vite/.test(t)) return "Circuit maison 20 min, 40 s d’effort / 20 s de pause, 3 tours.";
+      if (/course|run|footing/.test(t)) return "Échauffe 5 min, puis 6×1 min un peu plus vite / 1 min facile.";
+      if (/abdo|core|gainage/.test(t)) return "Dead bug 8/côté, side plank 25 s, hollow hold 20 s. 3 tours.";
+      return "Garde la séance affichée. Hydrate-toi et note comment tu te sens après.";
+    }
+    document.getElementById("ask").onclick=()=>{ const v=document.getElementById("q").value.trim(); if(!v) return; document.getElementById("reply").textContent = coach(v); if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success"); };
+    paintPlan();
+  </script>
+</body>
+</html>
