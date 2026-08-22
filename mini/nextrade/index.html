@@ -7,66 +7,213 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root { --bg:#f3f7ff; --ink:#16324f; --muted:#5b7390; --mint:#1dbf9a; --rose:#ef5d7a; --line:#d7e3f4; }
+    :root { --bg:#eef5ff; --ink:#14324d; --muted:#5b7390; --mint:#12b98a; --rose:#ef5d7a; --line:#d5e3f4; --card:#fff; }
     * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    body { margin:0; font-family:Outfit,system-ui,sans-serif; color:var(--ink); min-height:100dvh; background:radial-gradient(900px 380px at 0% -10%, #c8e7ff 0%, transparent 55%), radial-gradient(700px 320px at 100% 0%, #d9ffe8 0%, transparent 50%), var(--bg); padding:calc(16px + env(safe-area-inset-top)) 16px calc(22px + env(safe-area-inset-bottom)); }
+    body { margin:0; font-family:Outfit,system-ui,sans-serif; color:var(--ink); min-height:100dvh; background:radial-gradient(900px 380px at 0% -10%, #c8e7ff 0%, transparent 55%), radial-gradient(700px 320px at 110% 0%, #d4ffe8 0%, transparent 48%), var(--bg); padding:calc(14px + env(safe-area-inset-top)) 14px calc(20px + env(safe-area-inset-bottom)); }
     .wrap { max-width:430px; margin:0 auto; }
-    .badge { display:inline-block; padding:6px 12px; border-radius:999px; background:#e7f4ff; color:#2a6aa3; font-size:12px; letter-spacing:.06em; text-transform:uppercase; }
-    h1 { margin:10px 0 4px; font-size:28px; }
-    .lead { margin:0 0 14px; color:var(--muted); font-size:14px; }
-    .hero { background:linear-gradient(180deg,#fff,#f4fbff); border:1px solid var(--line); border-radius:24px; padding:16px; box-shadow:0 16px 0 #d5e6f7, 0 22px 28px rgba(40,80,130,.08); }
-    .cash { font-size:34px; font-weight:700; }
-    .pnl { font-weight:700; } .up { color:var(--mint); } .down { color:var(--rose); }
-    .list { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
-    .row { display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid var(--line); border-radius:18px; padding:12px 14px; box-shadow:0 10px 0 #e4eef8; }
-    .sym { font-weight:700; } .mini { color:var(--muted); font-size:12px; } .btns { display:flex; gap:8px; }
-    button { border:0; cursor:pointer; font:700 13px Outfit; border-radius:12px; height:36px; padding:0 12px; }
-    .buy { background:linear-gradient(180deg,#bff8e6,#1dbf9a); color:#053428; box-shadow:0 5px 0 #12886d; }
-    .sell { background:linear-gradient(180deg,#ffd4dc,#ef5d7a); color:#4a1020; box-shadow:0 5px 0 #b63b54; }
-    button:active { transform:translateY(3px); }
-    .hint { color:var(--muted); font-size:12px; text-align:center; margin-top:12px; }
+    .badge { display:inline-block; padding:5px 10px; border-radius:999px; background:#e4f2ff; color:#2a6aa3; font-size:11px; letter-spacing:.07em; text-transform:uppercase; }
+    h1 { margin:8px 0 4px; font-size:26px; }
+    .lead { margin:0 0 12px; color:var(--muted); font-size:13px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:14px; box-shadow:0 12px 0 #d7e6f6, 0 16px 22px rgba(40,80,130,.07); margin-bottom:12px; }
+    .row { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .cash { font-size:30px; font-weight:700; letter-spacing:-.03em; }
+    .pnl { font-weight:700; font-size:14px; } .up { color:var(--mint); } .down { color:var(--rose); }
+    .mini { color:var(--muted); font-size:12px; }
+    canvas { display:block; width:100%; }
+    .asset { display:grid; grid-template-columns:1fr 88px auto; gap:8px; align-items:center; padding:10px 0; border-top:1px solid #eaf1f8; cursor:pointer; }
+    .asset:first-child { border-top:0; }
+    .sym { font-weight:700; } .px { font-weight:700; text-align:right; }
+    .btns { display:flex; gap:6px; margin-top:10px; }
+    button { border:0; cursor:pointer; font:700 13px Outfit; border-radius:12px; height:38px; padding:0 12px; }
+    .buy { background:linear-gradient(180deg,#b8f6e3,#12b98a); color:#053428; box-shadow:0 5px 0 #0e8a68; }
+    .sell { background:linear-gradient(180deg,#ffd2dc,#ef5d7a); color:#4a1020; box-shadow:0 5px 0 #b63b54; }
+    .ghost { background:#f4f8fd; color:var(--ink); box-shadow:0 5px 0 #d5e0ee; border:1px solid var(--line); }
+    button:active { transform:translateY(3px); box-shadow:0 2px 0 #c9d7e8; }
+    .tf { display:flex; gap:6px; margin:8px 0; }
+    .chip { height:30px; padding:0 10px; border-radius:999px; background:#f3f8ff; border:1px solid var(--line); color:var(--ink); font:600 12px Outfit; box-shadow:none; }
+    .chip.on { background:linear-gradient(180deg,#d9ecff,#7fb6ff); }
+    .book { display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:12px; }
+    .bid, .ask { border-radius:12px; padding:8px; }
+    .bid { background:#e9faf4; } .ask { background:#ffecef; }
+    .lvl { display:flex; justify-content:space-between; padding:3px 0; }
+    .tape { max-height:92px; overflow:auto; font-size:12px; }
+    .tape div { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid #eef3f8; }
+    .back { margin-bottom:8px; }
+    .hint { text-align:center; color:var(--muted); font-size:12px; margin-top:4px; }
+    .hidden { display:none; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="badge">Mini App · NexTrade</div>
-    <h1>Carnet démo</h1>
-    <p class="lead">Watchlist lumineuse, achats / ventes simulés. Pas un conseil financier.</p>
-    <section class="hero"><div class="mini">Portefeuille papier</div><div class="cash" id="cash">10 000 €</div><div class="pnl" id="pnl">P&L +0 €</div></section>
-    <div class="list" id="list"></div>
-    <p class="hint">Les prix bougent localement pour l’exercice. Aucun ordre réel.</p>
+    <div id="home">
+      <div class="badge">Mini App · NexTrade</div>
+      <h1>Marché démo</h1>
+      <p class="lead">Chandeliers, volume, carnet d’ordres. Prix simulés — pas un conseil financier.</p>
+      <section class="card">
+        <div class="mini">Portefeuille papier</div>
+        <div class="row"><div class="cash" id="cash">10 000 €</div><div class="pnl" id="pnl">+0 €</div></div>
+        <canvas id="eq" height="70"></canvas>
+      </section>
+      <section class="card">
+        <div class="mini">Watchlist · tape pour le chart</div>
+        <div id="list"></div>
+      </section>
+    </div>
+    <div id="detail" class="hidden">
+      <button class="ghost back" id="back">← Marché</button>
+      <section class="card">
+        <div class="row">
+          <div><div class="sym" id="dSym">BTC</div><div class="mini" id="dName">Bitcoin</div></div>
+          <div style="text-align:right"><div class="px" id="dPx">0</div><div class="mini" id="dCh">0%</div></div>
+        </div>
+        <div class="tf" id="tfs"></div>
+        <canvas id="chart" height="220"></canvas>
+        <canvas id="vol" height="46"></canvas>
+        <div class="btns"><button class="buy" id="buy">Buy</button><button class="sell" id="sell">Sell</button></div>
+        <div class="mini" id="pos" style="margin-top:8px"></div>
+      </section>
+      <section class="card"><div class="mini">Carnet d’ordres</div><div class="book"><div class="bid" id="bids"></div><div class="ask" id="asks"></div></div></section>
+      <section class="card"><div class="mini">Dernières transactions</div><div class="tape" id="tape"></div></section>
+    </div>
+    <p class="hint">Démo locale. Aucun ordre réel n’est envoyé.</p>
   </div>
   <script>
     const tg = window.Telegram?.WebApp;
-    if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor("#f3f7ff"); tg.setBackgroundColor("#f3f7ff"); }
-    const KEY = "nextrade.v1";
-    const ASSETS = [{ id:"EURUSD", name:"EUR / USD", px:1.086 },{ id:"BTC", name:"Bitcoin", px:64250 },{ id:"AAPL", name:"Apple", px:228.4 },{ id:"GOLD", name:"Or", px:2388 }];
-    let state = JSON.parse(localStorage.getItem(KEY) || "null") || { cash:10000, pos:{EURUSD:0,BTC:0,AAPL:0,GOLD:0}, start:10000 };
-    function fmt(n){ return n.toLocaleString("fr-FR",{maximumFractionDigits:2}) + " €"; }
-    function persist(){ localStorage.setItem(KEY, JSON.stringify(state)); }
-    function equity(){ return state.cash + ASSETS.reduce((s,a)=> s + state.pos[a.id]*a.px, 0); }
-    function render(){
-      const eq = equity(); const d = eq - state.start;
-      document.getElementById("cash").textContent = fmt(eq);
-      const el = document.getElementById("pnl");
-      el.textContent = `P&L ${d>=0?"+":""}${fmt(d)}`;
-      el.className = "pnl " + (d>=0?"up":"down");
-      document.getElementById("list").innerHTML = ASSETS.map(a => {
-        const qty = state.pos[a.id];
-        return `<div class="row"><div><div class="sym">${a.id}</div><div class="mini">${a.name} · ${a.px.toLocaleString("fr-FR")}${qty? " · qty "+qty:""}</div></div><div class="btns"><button class="buy" data-id="${a.id}" data-side="buy">Buy</button><button class="sell" data-id="${a.id}" data-side="sell">Sell</button></div></div>`;
-      }).join("");
+    if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor("#eef5ff"); tg.setBackgroundColor("#eef5ff"); }
+    const KEY = "nextrade.v2";
+    const ASSETS = [
+      { id:"EURUSD", name:"EUR / USD", px:1.0862, dec:5, unit:1000 },
+      { id:"BTC", name:"Bitcoin", px:64250, dec:0, unit:0.001 },
+      { id:"ETH", name:"Ethereum", px:3120, dec:1, unit:0.01 },
+      { id:"AAPL", name:"Apple", px:228.4, dec:2, unit:1 },
+      { id:"TSLA", name:"Tesla", px:247.8, dec:2, unit:1 },
+      { id:"GOLD", name:"Or", px:2388, dec:1, unit:0.1 }
+    ];
+    const TFS = [
+      { id:"1m", label:"1m", n:48, step:0.0022 },
+      { id:"5m", label:"5m", n:48, step:0.0035 },
+      { id:"1h", label:"1H", n:48, step:0.006 },
+      { id:"1d", label:"1D", n:40, step:0.012 }
+    ];
+    let state = JSON.parse(localStorage.getItem(KEY) || "null") || { cash:10000, start:10000, pos:Object.fromEntries(ASSETS.map(a=>[a.id,0])), equity:[10000] };
+    let current = "BTC", tf = "5m";
+    const series = {}, sparks = {}, tapes = {};
+    function seed(a, spec) {
+      const arr = []; let p = a.px;
+      for (let i=0;i<spec.n;i++){
+        const o = p;
+        const drift = (Math.random()-.48)*spec.step*p;
+        const h = o + Math.abs(drift) + Math.random()*spec.step*p*0.4;
+        const l = o - Math.abs(drift) - Math.random()*spec.step*p*0.4;
+        const c = Math.max(l, Math.min(h, o + drift));
+        arr.push({o,h,l,c,v:40+Math.random()*180}); p = c;
+      }
+      a.px = +p.toFixed(a.dec); return arr;
     }
-    document.getElementById("list").onclick = e => {
-      const b = e.target.closest("button"); if(!b) return;
-      const a = ASSETS.find(x=>x.id===b.dataset.id); const side = b.dataset.side;
-      const unit = a.id==="BTC" ? 0.001 : a.id==="EURUSD" ? 1000 : 1; const cost = a.px * unit;
-      if (side==="buy" && state.cash>=cost) { state.cash-=cost; state.pos[a.id]+=unit; }
-      else if (side==="sell" && state.pos[a.id]>=unit) { state.cash+=cost; state.pos[a.id]-=unit; }
-      persist(); render();
-      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
-    };
-    setInterval(()=>{ ASSETS.forEach(a => { a.px = +(a.px * (1 + (Math.random()-.5)*0.004)).toFixed(a.px>50?2:5); }); render(); }, 2200);
-    render();
+    ASSETS.forEach(a => {
+      series[a.id] = {};
+      TFS.forEach(t => series[a.id][t.id] = seed({...a, px:a.px}, t));
+      a.px = series[a.id]["5m"].at(-1).c;
+      sparks[a.id] = series[a.id]["5m"].map(x=>x.c);
+      tapes[a.id] = [];
+    });
+    const fmt = (n,d=2) => n.toLocaleString("fr-FR",{minimumFractionDigits:d, maximumFractionDigits:d});
+    const money = n => fmt(n,2) + " €";
+    const persist = () => localStorage.setItem(KEY, JSON.stringify(state));
+    const asset = id => ASSETS.find(a=>a.id===id);
+    function equity(){ return state.cash + ASSETS.reduce((s,a)=> s + (state.pos[a.id]||0)*a.px, 0); }
+    function spark(el, data, up){
+      const w = el.width = el.clientWidth * devicePixelRatio;
+      const h = el.height = el.clientHeight * devicePixelRatio;
+      const ctx = el.getContext("2d");
+      const min = Math.min(...data), max = Math.max(...data);
+      ctx.clearRect(0,0,w,h); ctx.beginPath();
+      data.forEach((v,i)=>{ const x=i/(data.length-1)*w; const y=h-((v-min)/(max-min||1))*h; i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+      ctx.strokeStyle = up ? "#12b98a" : "#ef5d7a"; ctx.lineWidth = 2*devicePixelRatio; ctx.stroke();
+    }
+    function candles(cv, bars){
+      const w = cv.width = cv.clientWidth * devicePixelRatio;
+      const h = cv.height = 220 * devicePixelRatio;
+      const ctx = cv.getContext("2d"); ctx.clearRect(0,0,w,h);
+      const pad = 8*devicePixelRatio;
+      const hi = Math.max(...bars.map(b=>b.h)), lo = Math.min(...bars.map(b=>b.l)), span = hi-lo || 1;
+      const bw = (w-pad*2)/bars.length * 0.68;
+      const y = v => pad + (1-(v-lo)/span)*(h-pad*2);
+      ctx.strokeStyle = "#e4eef8"; ctx.lineWidth = devicePixelRatio;
+      for(let i=0;i<4;i++){ const gy = pad + i*(h-pad*2)/3; ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke(); }
+      bars.forEach((b,i)=>{
+        const x = pad + (i+0.5)*(w-pad*2)/bars.length; const up = b.c >= b.o;
+        ctx.strokeStyle = ctx.fillStyle = up ? "#12b98a" : "#ef5d7a";
+        ctx.beginPath(); ctx.moveTo(x,y(b.h)); ctx.lineTo(x,y(b.l)); ctx.lineWidth = devicePixelRatio; ctx.stroke();
+        const top = y(Math.max(b.o,b.c)), bot = y(Math.min(b.o,b.c));
+        ctx.fillRect(x-bw/2, top, bw, Math.max(devicePixelRatio*2, bot-top));
+      });
+    }
+    function volumes(cv, bars){
+      const w = cv.width = cv.clientWidth * devicePixelRatio;
+      const h = cv.height = 46 * devicePixelRatio;
+      const ctx = cv.getContext("2d"); ctx.clearRect(0,0,w,h);
+      const max = Math.max(...bars.map(b=>b.v)); const bw = w/bars.length * 0.62;
+      bars.forEach((b,i)=>{ const x=(i+0.5)*w/bars.length; const bh=(b.v/max)*h*0.9; ctx.fillStyle = b.c>=b.o ? "rgba(18,185,138,.45)" : "rgba(239,93,122,.45)"; ctx.fillRect(x-bw/2, h-bh, bw, bh); });
+    }
+    function renderHome(){
+      const eq = equity(); const d = eq - state.start;
+      document.getElementById("cash").textContent = money(eq);
+      const pnl = document.getElementById("pnl"); pnl.textContent = (d>=0?"+":"") + money(d); pnl.className = "pnl " + (d>=0?"up":"down");
+      document.getElementById("list").innerHTML = ASSETS.map(a=>{
+        const sparkData = sparks[a.id]; const ch = (sparkData.at(-1)-sparkData[0])/sparkData[0]*100;
+        return `<div class="asset" data-id="${a.id}"><div><div class="sym">${a.id}</div><div class="mini">${a.name}</div></div><canvas class="sp" height="36"></canvas><div class="px ${ch>=0?"up":"down"}">${fmt(a.px,a.dec)}<div class="mini">${ch>=0?"+":""}${ch.toFixed(2)}%</div></div></div>`;
+      }).join("");
+      document.querySelectorAll(".asset").forEach((row,i)=>{ const c=row.querySelector("canvas"); c.style.height="36px"; spark(c, sparks[ASSETS[i].id], sparks[ASSETS[i].id].at(-1)>=sparks[ASSETS[i].id][0]); row.onclick=()=>openDetail(ASSETS[i].id); });
+      spark(document.getElementById("eq"), state.equity.slice(-40), state.equity.at(-1)>=state.start);
+    }
+    function book(a){
+      const mid=a.px, tick=a.px>100?a.px*0.0004:a.px*0.00015, bids=[], asks=[];
+      for(let i=1;i<=6;i++){ bids.push({p:+(mid-i*tick).toFixed(a.dec), s:(8+Math.random()*40).toFixed(2)}); asks.push({p:+(mid+i*tick).toFixed(a.dec), s:(8+Math.random()*40).toFixed(2)}); }
+      document.getElementById("bids").innerHTML = `<div class="mini">Bids</div>` + bids.map(x=>`<div class="lvl"><span>${x.p}</span><span>${x.s}</span></div>`).join("");
+      document.getElementById("asks").innerHTML = `<div class="mini">Asks</div>` + asks.map(x=>`<div class="lvl"><span>${x.p}</span><span>${x.s}</span></div>`).join("");
+    }
+    function renderDetail(){
+      const a = asset(current); const bars = series[a.id][tf];
+      const first=bars[0].o, last=bars.at(-1).c, ch=(last-first)/first*100;
+      document.getElementById("dSym").textContent=a.id; document.getElementById("dName").textContent=a.name;
+      document.getElementById("dPx").textContent=fmt(a.px,a.dec);
+      const dch=document.getElementById("dCh"); dch.textContent=(ch>=0?"+":"")+ch.toFixed(2)+"%"; dch.className="mini "+(ch>=0?"up":"down");
+      document.getElementById("tfs").innerHTML = TFS.map(t=>`<button class="chip ${t.id===tf?"on":""}" data-tf="${t.id}">${t.label}</button>`).join("");
+      candles(document.getElementById("chart"), bars); volumes(document.getElementById("vol"), bars);
+      const qty=state.pos[a.id]||0;
+      document.getElementById("pos").textContent = qty ? `Position : ${qty} · valeur ${money(qty*a.px)}` : "Pas de position sur cet actif.";
+      book(a);
+      document.getElementById("tape").innerHTML = tapes[a.id].slice(0,12).map(t=>`<div><span class="${t.side}">${t.side==="up"?"BUY":"SELL"}</span><span>${fmt(t.p,a.dec)}</span><span>${t.q}</span></div>`).join("") || `<div class="mini">En attente de ticks…</div>`;
+    }
+    function openDetail(id){ current=id; document.getElementById("home").classList.add("hidden"); document.getElementById("detail").classList.remove("hidden"); renderDetail(); }
+    document.getElementById("back").onclick=()=>{ document.getElementById("detail").classList.add("hidden"); document.getElementById("home").classList.remove("hidden"); renderHome(); };
+    document.getElementById("tfs").onclick=e=>{ const b=e.target.closest("[data-tf]"); if(!b) return; tf=b.dataset.tf; renderDetail(); };
+    function trade(side){
+      const a=asset(current); const cost=a.px*a.unit;
+      if(side==="buy" && state.cash>=cost){ state.cash-=cost; state.pos[a.id]+=a.unit; tapes[a.id].unshift({side:"up",p:a.px,q:a.unit}); }
+      else if(side==="sell" && (state.pos[a.id]||0)>=a.unit){ state.cash+=cost; state.pos[a.id]-=a.unit; tapes[a.id].unshift({side:"down",p:a.px,q:a.unit}); }
+      persist(); renderDetail(); if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
+    }
+    document.getElementById("buy").onclick=()=>trade("buy");
+    document.getElementById("sell").onclick=()=>trade("sell");
+    function tick(){
+      ASSETS.forEach(a=>{
+        TFS.forEach(spec=>{
+          const arr=series[a.id][spec.id]; const last=arr.at(-1);
+          const drift=(Math.random()-.5)*spec.step*last.c;
+          last.h=Math.max(last.h,last.c+Math.abs(drift)*0.3); last.l=Math.min(last.l,last.c-Math.abs(drift)*0.3);
+          last.c=Math.max(last.l,Math.min(last.h,last.c+drift)); last.v+=Math.random()*4;
+          if(Math.random()<0.18){ const o=last.c; const c=o*(1+(Math.random()-.5)*spec.step); arr.push({o,h:Math.max(o,c),l:Math.min(o,c),c,v:30+Math.random()*80}); if(arr.length>spec.n) arr.shift(); }
+        });
+        a.px=+series[a.id]["5m"].at(-1).c.toFixed(a.dec);
+        sparks[a.id]=series[a.id]["5m"].map(x=>x.c);
+        if(Math.random()<0.35){ tapes[a.id].unshift({side:Math.random()>.5?"up":"down",p:a.px,q:a.unit}); tapes[a.id]=tapes[a.id].slice(0,16); }
+      });
+      state.equity.push(+equity().toFixed(2)); if(state.equity.length>80) state.equity.shift(); persist();
+      if(document.getElementById("detail").classList.contains("hidden")) renderHome(); else renderDetail();
+    }
+    renderHome(); setInterval(tick,1600);
   </script>
 </body>
 </html>
